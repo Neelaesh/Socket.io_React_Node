@@ -1,12 +1,12 @@
 import React, { FC } from "react";
 import Box from "@mui/material/Box";
 
-import NotificationCenter from "../components/NotificationCenter/NotificationCenter";
+import Messages from "../components/Messages/Messages";
 
 const App: FC = () => {
   return (
     <Box>
-      <NotificationCenter />
+      <Messages />
     </Box>
   );
 };

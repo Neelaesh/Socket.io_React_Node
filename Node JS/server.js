@@ -1,29 +1,42 @@
-const webSocket = require("ws");
-const wss = new webSocket.Server({ port: 8080 });
+const express = require("express");
+const http = require("http");
+const socketIo = require("socket.io");
+const cors = require("cors");
 
-// Broadcast to all users
-wss.broadcast = (data) => {
-  wss.clients.forEach((client) => {
-    if (client.readyState === webSocket.OPEN) {
-      client.send(data);
-    }
-  });
-};
+const app = express();
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
-wss.on("connection", (ws) => {
-  console.log("Client connected");
+const server = http.createServer(app);
+// socket io is based on HTTP + Websocket(uses internally)
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+  },
+});
 
-  ws.send("Welcome to the WebSocket server!");
+const PORT = process.env.PORT || 5000;
 
-  ws.on("message", (message) => {
-    console.log(`Received message: ${message}`);
+// Handle socket connections
+io.on("connection", (socket) => {
+  console.log("New user connected");
+
+  // Listen for incoming messages
+  socket.on("sendMessage", (message) => {
+    console.log("Received message:", message);
     // Broadcast the message to all connected clients
-    wss.broadcast(message);
+    io.emit("message", message);
   });
 
-  ws.on("close", () => {
-    console.log("Client disconnected");
+  // Handle user disconnect
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
   });
 });
 
-console.log("WebSocket server running on ws://localhost:8080");
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

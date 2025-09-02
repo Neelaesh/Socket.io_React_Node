@@ -4,6 +4,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 
 const app = express();
+// Using cors headers as Socket.io uses HTTP
 app.use(
   cors({
     origin: "*",
